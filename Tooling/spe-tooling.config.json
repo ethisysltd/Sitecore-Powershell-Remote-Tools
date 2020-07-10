@@ -1,0 +1,21 @@
+{
+    "InstallPath": "master:/sitecore/system/Modules",
+    "Items": [
+        {
+            "Name": "PowerShellTooling",
+            "DisplayName": "PowerShell Tooling",
+            "Icon": "Office/32x32/brain.png",
+            "Id": "{7F6AA771-B788-4ED4-A6BA-53B9259E6BF0}",
+            "Template": "/sitecore/templates/Common/Folder",
+            "Children": [
+                {
+                    "Name": "EventLogs",
+                    "DisplayName": "Event Logs",
+                    "Icon": "Office/32x32/chart_bar.png",
+                    "Id": "{B658A082-320E-44DE-9262-2464557F8C2B}",
+                    "Template": "/sitecore/templates/Common/Folder"
+                }
+            ]
+        }
+    ]
+}

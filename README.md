@@ -1,2 +1,2 @@
 # Sitecore-Remote-Tools
-Sitecore Remoting Tooling / Extension library
+Sitecore Powershell Remoting Tooling / Extension library
