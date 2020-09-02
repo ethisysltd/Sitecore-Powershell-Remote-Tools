@@ -8,35 +8,35 @@
 #
 # 2. Create Function to record SPE event
 
-class ToolingConfiguration
-{
-    [ValidateNotNullOrEmpty()][string]$InstallPath
-    [ValidateNotNullOrEmpty()][ToolingItem[]]$Items
-}
-
-class ToolingItem {
-    [ValidateNotNullOrEmpty()][string]$Name
-    [string]$DisplayName
-    [ValidateNotNullOrEmpty()][string]$Icon
-    [ValidateNotNullOrEmpty()][string]$Id
-    [ValidateNotNullOrEmpty()][string]$Template
-    [ToolingItem[]]$Children
-}
-
 Function Get-SetupSitecoreItemsScript {
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "spe-tooling.config.json"
     
-    $toolingConfiguration = [ToolingConfiguration](Get-Content $configFile | Out-String | ConvertFrom-Json)
-    $toolingConfigurationJson = $toolingConfiguration | ConvertTo-Json -Depth 4
+    $toolingConfiguration = (Get-Content $configFile | Out-String | ConvertFrom-Json)
+    $toolingConfigurationJson = $toolingConfiguration | ConvertTo-Json -Depth 100
     $configScriptBlock = [Scriptblock]::Create("`$configString = `'$toolingConfigurationJson`'" )
 
     # Setup Items
     $setupScript = [System.Management.Automation.ScriptBlock]{
 
         $config = [ToolingConfiguration]($configString | ConvertFrom-Json)
+
+        $config.Templates | ForEach-Object {
+            try {
+                $item = [ToolingItem]$_
+                Invoke-CreateToolingItem -ParentPath $config.TemplateInstallPath -Item $item
+            } catch {
+                Write-Output "ERROR at SetupSitecoreItemsScript`n$($_.Exception.Message)"
+            }
+        }
+
         $config.Items | ForEach-Object {
-            $item = $_
-            Invoke-CreateToolingItem -ParentPath $config.InstallPath -Item $item
+            try {
+                $item = [ToolingItem]$_
+                Invoke-CreateToolingItem -ParentPath $config.SystemInstallPath -Item $item
+            } catch {
+                Write-Output "ERROR at SetupSitecoreItemsScript`n$($_.Exception.Message)"
+            }
+           
         }
     }
     $configWithSetupScript = [System.Management.Automation.ScriptBlock]::Create("$configScriptBlock`n$setupScript`n")

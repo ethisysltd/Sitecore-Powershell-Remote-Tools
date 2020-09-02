@@ -1,14 +1,17 @@
 class ToolingConfiguration
 {
-    [ValidateNotNullOrEmpty()][string]$InstallPath
-    [ValidateNotNullOrEmpty()][Object[]]$Items
+    [ValidateNotNullOrEmpty()][string]$SystemInstallPath
+    [ValidateNotNullOrEmpty()][string]$TemplateInstallPath
+    [ValidateNotNullOrEmpty()][ToolingItem[]]$Items
+    [ValidateNotNullOrEmpty()][ToolingItem[]]$Templates
 }
 
 class ToolingItem {
-    [ValidateNotNullOrEmpty()][string]$Name
-    [string]$DisplayName
-    [ValidateNotNullOrEmpty()][string]$Icon
     [ValidateNotNullOrEmpty()][string]$Id
     [ValidateNotNullOrEmpty()][string]$Template
-    [Object[]]$Children
+    [ValidateNotNullOrEmpty()][string]$Name
+    [string]$DisplayName
+    [string]$Icon
+    [string]$FieldType
+    [PSCustomObject[]]$Children
 }

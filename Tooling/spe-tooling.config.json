@@ -1,17 +1,57 @@
 {
-    "InstallPath": "master:/sitecore/system/Modules",
+    "SystemInstallPath": "master:/sitecore/system/Modules",
+    "TemplateInstallPath": "master:/sitecore/templates/Modules",
+    "Templates": [
+        {
+            "Name": "PowerShellToolset",
+            "DisplayName": "PowerShell Toolset",
+            "Icon": "/~/icon/office/32x32/folder.png",
+            "Id": "{103F435E-D727-480A-B2DB-2BC2C879D104}",
+            "Template": "/sitecore/templates/Common/Folder",
+            "Children": [
+                {
+                    "Name": "PowerShellToolsetEventLog",
+                    "DisplayName": "PowerShell Toolset EventLog",
+                    "Icon": "/~/icon/imaging/32x32/cube.png",
+                    "Id": "{BAA3EE07-86AE-4B7F-8C9B-FE83E17DD416}",
+                    "Template": "/sitecore/templates/System/Templates/Template",
+                    "Children": [
+                        {
+                            "Name": "Data",
+                            "Id": "{16BFB66A-2269-4C08-94A4-652212D8D169}",
+                            "Template": "/sitecore/templates/System/Templates/Template section",
+                            "Children": [
+                                {
+                                    "Name": "ScriptName",
+                                    "Id": "{7636BC54-0267-4961-86C7-1798BC737B99}",
+                                    "Template": "/sitecore/templates/System/Templates/Template field",
+                                    "FieldType": "Single-Line Text"
+                                },
+                                {
+                                    "Name": "FileHash",
+                                    "Id": "{1E51DCA7-B4B1-49A1-8411-E2F7E5EC53CC}",
+                                    "Template": "/sitecore/templates/System/Templates/Template field",
+                                    "FieldType": "Single-Line Text"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
     "Items": [
         {
-            "Name": "PowerShellTooling",
-            "DisplayName": "PowerShell Tooling",
-            "Icon": "Office/32x32/brain.png",
+            "Name": "PowerShellToolset",
+            "DisplayName": "PowerShell Toolset",
+            "Icon": "~/icon/office/32x32/lightbulb_on.png",
             "Id": "{7F6AA771-B788-4ED4-A6BA-53B9259E6BF0}",
             "Template": "/sitecore/templates/Common/Folder",
             "Children": [
                 {
                     "Name": "EventLogs",
                     "DisplayName": "Event Logs",
-                    "Icon": "Office/32x32/chart_bar.png",
+                    "Icon": "/~/icon/office/32x32/chart_bar.png",
                     "Id": "{B658A082-320E-44DE-9262-2464557F8C2B}",
                     "Template": "/sitecore/templates/Common/Folder"
                 }

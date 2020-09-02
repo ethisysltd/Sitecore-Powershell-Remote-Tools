@@ -6,21 +6,41 @@ Function Invoke-CreateToolingItem {
         [ToolingItem]$Item
     )
 
-    $newItem = New-Item `
+    try {
+        $newItem = New-Item `
         -Path $ParentPath `
         -Name $Item.Name `
         -ItemType $Item.Template `
         -ForceId $Item.Id
 
-    $newItem.Editing.BeginEdit()
-    $newItem["__Display name"] = $Item.DisplayName 
-    $newItem["__Icon"] = $Item.Icon
-    $newItem.Editing.EndEdit()
+        $newItem.Editing.BeginEdit()
+        if($null -ne $Item.DisplayName) {
+            $newItem["__Display name"] = $Item.DisplayName 
+        }
+        if($null -ne $Item.Icon) {
+            $newItem["__Icon"] = $Item.Icon
+        }
+
+        # Sitecore Template Field
+        if($Item.Template -eq "/sitecore/templates/System/Templates/Template field") {
+            $newItem["Type"] = $Item.FieldType 
+        }
+
+        $newItem.Editing.EndEdit()
+    } catch {
+        Write-Output "ERROR at Invoke-CreateToolingItem:`n$($_.Exception.Message)"
+    }
+   
+    
 
     # Create any children
     if($null -ne $Item.Children) {
         $Item.Children | ForEach-Object {
-            Invoke-CreateToolingItem -ParentPath "master:/$($newItem.Paths.FullPath)" -Item $_
+            try {
+                Invoke-CreateToolingItem -ParentPath "master:/$($newItem.Paths.FullPath)" -Item $_
+            } catch {
+                Write-Output "ERROR at Invoke-CreateToolingItem:Creating children:`n$($_.Exception.Message)"
+            }
         }
     }
 }
