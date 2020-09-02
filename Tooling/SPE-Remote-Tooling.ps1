@@ -8,10 +8,53 @@
 #
 # 2. Create Function to record SPE event
 
-Function Get-SetupSitecoreItemsScript {
+Function Get-Config {
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "spe-tooling.config.json"
-    
     $toolingConfiguration = (Get-Content $configFile | Out-String | ConvertFrom-Json)
+    return $toolingConfiguration
+}
+
+Function Invoke-DoesItemExist {
+    param(
+        [Parameter(Mandatory = $true)]
+        [PSObject]$Item
+    )
+    return $Item.PSTypeNames -Contains "Deserialized.Sitecore.Data.Items.Item"
+}
+
+<#
+.DESCRIPTION
+Determine if the toolset items have been already installed
+#> 
+Function Invoke-InstallCheck {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingPlainTextForPassword", "SitecorePassword")]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SitecoreInstanceUri,
+        [Parameter(Mandatory = $true)]
+        [string]$SitecoreUsername,
+        [Parameter(Mandatory = $true)]
+        [string]$SitecorePassword
+    )
+    $config = Get-Config
+
+    $fistInstalledItemPath = "$($config.SystemInstallPath)/$($config.Templates[0].Name)"
+
+    $session = New-ScriptSession `
+        -Username $SitecoreUsername `
+        -Password $SitecorePassword `
+        -ConnectionUri $SitecoreInstanceUri
+
+    $getRootItemScript = [System.Management.Automation.ScriptBlock]::Create("Get-Item -Path $fistInstalledItemPath")
+
+    $result = Invoke-RemoteScript -Session $session -ScriptBlock $getRootItemScript
+    Stop-ScriptSession -Session $session
+
+    return Invoke-DoesItemExist -Item $result
+}
+
+Function Get-SetupSitecoreItemsScript {   
+    $toolingConfiguration = Get-Config
     $toolingConfigurationJson = $toolingConfiguration | ConvertTo-Json -Depth 100
     $configScriptBlock = [Scriptblock]::Create("`$configString = `'$toolingConfigurationJson`'" )
 
@@ -49,11 +92,26 @@ Function Invoke-Setup {
     param(
         [Parameter(Mandatory = $true)]
         [string]$SitecoreInstanceUri,
-        [Parameter(Mandatory = $false)]
-        [string]$SitecoreUsername = "admin",
-        [Parameter(Mandatory = $false)]
-        [string]$SitecorePassword = "b"
+        [Parameter(Mandatory = $true)]
+        [string]$SitecoreUsername,
+        [Parameter(Mandatory = $true)]
+        [string]$SitecorePassword,
+        [Parameter(Mandatory = $true)]
+        [switch]$Force
     )
+
+    $isInstalled = Invoke-InstallCheck `
+        -SitecoreInstanceUri $SitecoreInstanceUri `
+        -SitecoreUsername $SitecoreUsername `
+        -SitecorePassword $SitecorePassword
+
+    
+    # If already installed then drop out
+    if($isInstalled -And $Force -eq $false) {
+        return
+    }
+
+    Write-Host "Installing SPE Toolset....." -ForegroundColor Green
 
     # Import Classes
     $classesFile = (Join-Path -Path $PSScriptRoot -ChildPath "Classes.ps1") 
@@ -81,8 +139,6 @@ Function Invoke-Setup {
         -Session $session `
         -ScriptBlock $scriptblockWithFunctions `
         -AsJob 
-
-    Write-Host $scriptblockWithFunctions
 
     if (!$jobId) { 
         Write-Warning "No jobId was created. Please check if your Powershell Remoting is activated on the target instance '$SitecoreInstanceUri'`nRemember to have the Execution Policy set to: Set-ExecutionPolicy RemoteSigned -Scope Process"

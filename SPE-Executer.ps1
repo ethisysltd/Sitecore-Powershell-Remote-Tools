@@ -41,15 +41,15 @@ if(-Not (Test-Path $PathToSPEModule)) {
     Exit
 }
 Import-Module -Name $PathToSPEModule -Force
+Import-Module -Name "$PSScriptRoot\Tooling\SPE-Remote-Tooling.ps1" -Force
+
+Invoke-Setup `
+    -SitecoreInstanceUri $SitecoreInstanceUri `
+    -SitecoreUsername $SitecoreUsername `
+    -SitecorePassword $SitecorePassword `
+    -Force:$RunSetupOnly
 
 if($RunSetupOnly) {
-    Import-Module -Name "$PSScriptRoot\Tooling\SPE-Remote-Tooling.ps1" -Force
-
-    Invoke-Setup `
-        -SitecoreInstanceUri $SitecoreInstanceUri `
-        -SitecoreUsername $SitecoreUsername `
-        -SitecorePassword $SitecorePassword
-
     Exit
 }
 

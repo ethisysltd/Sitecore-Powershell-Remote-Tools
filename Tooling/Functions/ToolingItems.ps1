@@ -30,8 +30,6 @@ Function Invoke-CreateToolingItem {
     } catch {
         Write-Output "ERROR at Invoke-CreateToolingItem:`n$($_.Exception.Message)"
     }
-   
-    
 
     # Create any children
     if($null -ne $Item.Children) {
