@@ -14,4 +14,6 @@ class ToolingItem {
     [string]$Icon
     [string]$FieldType
     [PSCustomObject[]]$Children
+    [bool]$IsBucket
+    [bool]$Bucketable
 }

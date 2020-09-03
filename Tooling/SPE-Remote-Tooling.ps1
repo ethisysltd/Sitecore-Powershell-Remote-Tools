@@ -8,12 +8,6 @@
 #
 # 2. Create Function to record SPE event
 
-Function Get-Config {
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "spe-tooling.config.json"
-    $toolingConfiguration = (Get-Content $configFile | Out-String | ConvertFrom-Json)
-    return $toolingConfiguration
-}
-
 Function Invoke-DoesItemExist {
     param(
         [Parameter(Mandatory = $true)]
@@ -23,7 +17,7 @@ Function Invoke-DoesItemExist {
 }
 
 <#
-.DESCRIPTION
+.SYNOPSIS
 Determine if the toolset items have been already installed
 #> 
 Function Invoke-InstallCheck {
@@ -54,9 +48,7 @@ Function Invoke-InstallCheck {
 }
 
 Function Get-SetupSitecoreItemsScript {   
-    $toolingConfiguration = Get-Config
-    $toolingConfigurationJson = $toolingConfiguration | ConvertTo-Json -Depth 100
-    $configScriptBlock = [Scriptblock]::Create("`$configString = `'$toolingConfigurationJson`'" )
+    $configScriptBlock = Get-ConfigScriptBlock
 
     # Setup Items
     $setupScript = [System.Management.Automation.ScriptBlock]{
@@ -105,26 +97,25 @@ Function Invoke-Setup {
         -SitecoreUsername $SitecoreUsername `
         -SitecorePassword $SitecorePassword
 
-    
     # If already installed then drop out
     if($isInstalled -And $Force -eq $false) {
         return
     }
-
     Write-Host "Installing SPE Toolset....." -ForegroundColor Green
+
 
     # Import Classes
     $classesFile = (Join-Path -Path $PSScriptRoot -ChildPath "Classes.ps1") 
     Import-Module $classesFile
-    $classesScriptBlock = Get-Command $classesFile | Select-Object -ExpandProperty ScriptBlock 
 
     # Add Classes to the top of SPE functions
-    $speFunctions = $classesScriptBlock;
-    $functionsFolder = "$PSScriptRoot\Functions"
-    Get-ChildItem $functionsFolder -Filter *.ps1 | Foreach-Object {
-        $function = Get-Command (Join-Path -Path $functionsFolder -ChildPath $_) | Select-Object -ExpandProperty ScriptBlock 
+    $speFunctions = $null;
+    $remotingFunctionsFolder = "$PSScriptRoot\RemotingFunctions"
+    Get-ChildItem $remotingFunctionsFolder -Filter *.ps1 | Foreach-Object {
+        $function = Get-Command (Join-Path -Path $remotingFunctionsFolder -ChildPath $_) | Select-Object -ExpandProperty ScriptBlock 
         $speFunctions = [System.Management.Automation.ScriptBlock]::Create("$speFunctions`n$function`n")
     }
+
 
     $setupItemsScript = Get-SetupSitecoreItemsScript
     # Combine all imports with setup script

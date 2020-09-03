@@ -15,6 +15,7 @@
                     "Icon": "/~/icon/imaging/32x32/cube.png",
                     "Id": "{BAA3EE07-86AE-4B7F-8C9B-FE83E17DD416}",
                     "Template": "/sitecore/templates/System/Templates/Template",
+                    "Bucketable": true,
                     "Children": [
                         {
                             "Name": "Data",
@@ -53,7 +54,8 @@
                     "DisplayName": "Event Logs",
                     "Icon": "/~/icon/office/32x32/chart_bar.png",
                     "Id": "{B658A082-320E-44DE-9262-2464557F8C2B}",
-                    "Template": "/sitecore/templates/Common/Folder"
+                    "Template": "/sitecore/templates/Common/Folder",
+                    "IsBucket": true
                 }
             ]
         }

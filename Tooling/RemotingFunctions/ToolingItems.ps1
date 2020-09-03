@@ -20,6 +20,12 @@ Function Invoke-CreateToolingItem {
         if($null -ne $Item.Icon) {
             $newItem["__Icon"] = $Item.Icon
         }
+        if($null -ne $Item.IsBucket -And $Item.IsBucket -eq $true) {
+            $newItem["__Is Bucket"] = "1"
+        }
+        if($null -ne $Item.Bucketable -And $Item.Bucketable -eq $true) {
+            $newItem["__Bucketable"] = "1"
+        }
 
         # Sitecore Template Field
         if($Item.Template -eq "/sitecore/templates/System/Templates/Template field") {

@@ -43,6 +43,12 @@ if(-Not (Test-Path $PathToSPEModule)) {
 Import-Module -Name $PathToSPEModule -Force
 Import-Module -Name "$PSScriptRoot\Tooling\SPE-Remote-Tooling.ps1" -Force
 
+# Local Functions
+$localFunctionsFolder = "$PSScriptRoot\Tooling\LocalFunctions"
+Get-ChildItem $localFunctionsFolder -Filter *.ps1 | Foreach-Object {
+    Import-Module -Name $_.FullName -Force
+}
+
 Invoke-Setup `
     -SitecoreInstanceUri $SitecoreInstanceUri `
     -SitecoreUsername $SitecoreUsername `
@@ -83,6 +89,9 @@ Get-ChildItem "$PSScriptRoot\$scriptFolderName" -Filter *.ps1 -Recurse | Foreach
     Write-Host "Executing $_" -ForegroundColor Green
     # Create ScriptBlock
     $scriptblock = Get-Command $_.FullName | Select-Object -ExpandProperty ScriptBlock 
+
+    # Add Script Logging
+    New-ScriptEventLog -ScriptFilePath $_.FullName -Session $session
 
     #Combine scriptblock with SPE reusable Functions
     $scriptblockWithFunctions = [System.Management.Automation.ScriptBlock]::Create("$speFunctions`n$scriptblock")
