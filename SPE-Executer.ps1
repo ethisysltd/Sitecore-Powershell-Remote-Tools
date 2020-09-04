@@ -72,7 +72,9 @@ Get-ChildItem "$PSScriptRoot\Functions" -Filter *.ps1 | Foreach-Object {
 # VARIABLES
 #-----------------------------------------------------------------
 #region Variables
-$scriptFolderName = "Current"
+$scriptFolderName = "_Current"
+$runAwlasysScriptFolderName = "_RunAlways"
+
 #endregion Variables
 
 #-----------------------------------------------------------------
@@ -86,39 +88,11 @@ $session = New-ScriptSession `
 
 # Iterate through each SPE script in Current
 Get-ChildItem "$PSScriptRoot\$scriptFolderName" -Filter *.ps1 -Recurse | Foreach-Object {
-    # Create ScriptBlock
-    $scriptblock = Get-Command $_.FullName | Select-Object -ExpandProperty ScriptBlock 
-    # Get script event status 
-    $hasAlreadyRun = [boolean](Get-ScriptEventStatus -ScriptFilePath $_.FullName -Session $session)
+    Invoke-ExecuteSPEScript -File $_
+}
 
-    # If the script hasn't previously run
-    if($hasAlreadyRun -eq $false) {
-        Write-Host "Executing $_" -ForegroundColor Green
-        # Add Script Logging
-        New-ScriptEventLog -ScriptFilePath $_.FullName -Session $session
-
-        #Combine scriptblock with SPE reusable Functions
-        $scriptblockWithFunctions = [System.Management.Automation.ScriptBlock]::Create("$speFunctions`n$scriptblock")
-        
-        # Create new job referencing $script from imported Powershell Script
-        $jobId = Invoke-RemoteScript `
-            -Session $session `
-            -ScriptBlock $scriptblockWithFunctions `
-            -AsJob 
-
-        # Check if a job was created. If we don't have an id, something is wrong
-        if (!$jobId) { 
-            Write-Warning "No jobId was created. Please check if your Powershell Remoting is activated on the target instance '$SitecoreInstanceUri'`nRemember to have the Execution Policy set to: Set-ExecutionPolicy RemoteSigned -Scope Process"
-            
-        } else {
-            Wait-RemoteScriptSession `
-            -Session $session `
-            -Id $jobId `
-            -Delay 2
-        }
-
-    }
- 
+Get-ChildItem "$PSScriptRoot\$runAwlasysScriptFolderName" -Filter *.ps1 -Recurse | Foreach-Object {
+    Invoke-ExecuteSPEScript -File $_ -ExcludeRunCheck
 }
 
 Stop-ScriptSession -Session $session
