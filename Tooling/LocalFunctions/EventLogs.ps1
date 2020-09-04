@@ -111,16 +111,16 @@ Function Invoke-ExecuteScript {
     $jobId = Invoke-RemoteScript `
         -Session $Session `
         -ScriptBlock $Script `
-        -AsJob 
+        -AsJob
 
     if (!$jobId) { 
         Write-Warning "No jobId was created."
         
     } else {
         Wait-RemoteScriptSession `
-        -Session $Session `
-        -Id $jobId `
-        -Delay 5
+            -Session $Session `
+            -Id $jobId `
+            -Delay 1 `
     }
 }
 

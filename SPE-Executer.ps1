@@ -90,7 +90,6 @@ Get-ChildItem "$PSScriptRoot\$scriptFolderName" -Filter *.ps1 -Recurse | Foreach
     $scriptblock = Get-Command $_.FullName | Select-Object -ExpandProperty ScriptBlock 
     # Get script event status 
     $hasAlreadyRun = [boolean](Get-ScriptEventStatus -ScriptFilePath $_.FullName -Session $session)
-    Write-Host $hasAlreadyRun -ForegroundColor Green
 
     # If the script hasn't previously run
     if($hasAlreadyRun -eq $false) {
@@ -115,7 +114,7 @@ Get-ChildItem "$PSScriptRoot\$scriptFolderName" -Filter *.ps1 -Recurse | Foreach
             Wait-RemoteScriptSession `
             -Session $session `
             -Id $jobId `
-            -Delay 1
+            -Delay 2
         }
 
     }

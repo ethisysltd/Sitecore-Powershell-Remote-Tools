@@ -139,17 +139,7 @@ Function Invoke-Setup {
         Wait-RemoteScriptSession `
             -Session $session `
             -Id $jobId `
-            -Delay 5 
-
-        # Invoke-RemoteScript -Session $session -ScriptBlock {
-        #     $ss = Get-ScriptSession -Id $using:JobId
-        #     $ss | Receive-ScriptSession
-
-        #     Write-Host $ss
-        #     if($ss.LastErrors) {
-        #         $ss.LastErrors
-        #     }
-        # }
+            -Delay 2  
 
         Stop-ScriptSession -Session $session
     }
