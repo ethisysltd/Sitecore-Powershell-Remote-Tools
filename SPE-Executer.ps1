@@ -23,7 +23,7 @@ param(
     [Parameter(Mandatory = $false)]
     [string]$SitecorePassword = "b",
     [Parameter(Mandatory = $false)]
-    [string]$PathToSPEModule = "C:\Sitecore\Modules\SPE Remoting-5.0\SPE",
+    [string]$PathToSPEModule = ".\PowershellExtensions\v5.0\SPE",
     [Parameter(Mandatory = $false)]
     [switch]$RunSetupOnly
 )
