@@ -75,7 +75,12 @@ Function Get-ScriptEventStatus {
             Criteria = $criteria
         }
 
-        $allEventLogItems = Find-Item @props | Initialize-Item | Where-Object {$_.Name -eq $itemName -And $_.FileHash -eq $fileHash }
+        $allEventLogItems = Find-Item @props | Initialize-Item | `
+            Where-Object {
+                $_.Name -eq $itemName -And 
+                $_.ScriptName -eq $itemRelativePath -And 
+                $_.FileHash -eq $fileHash 
+            }
         
         $hasResults = if ($allEventLogItems.Count -gt 0) { $true } else { $false }
       
